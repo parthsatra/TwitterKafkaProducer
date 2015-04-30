@@ -28,13 +28,19 @@ var T = new Twit({
 });
 
 //Query to fetch the twitter stream with filter Love and Hate.
-var stream = T.stream('statuses/filter', { track: ['love', 'hate'] });
+var stream = T.stream('statuses/sample'); //, { track: ['love', 'hate'] });
 
 //Listening to 'tweet' event which sends callback whenever someone sends a tweet with the specified filter.
 stream.on('tweet', function(tweet){
+    tweet["id"] = tweet["id_str"];
     payloads = [{topic : "tweet_message", messages : JSON.stringify(tweet)}]
     prod.send(payloads, function(err, data) {
-    	console.log("Sent to kafka");
+    	console.log(tweet["entities"]["hashtags"]);
+    });
+
+    payloads2 = [{topic : "tweet_message_hdfs", messages : JSON.stringify(tweet)}]
+    prod.send(payloads2, function(err, data) {
+        //console.log(tweet["user"]["screen_name"]);
     });
 });
 
